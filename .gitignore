@@ -21,6 +21,7 @@
 !cyberattack-dataset/
 !spotify_wrap_2025/
 !netflix_titles/
+!UFC_EDA_ADVANCED/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -30,6 +31,7 @@
 !cyberattack-dataset/CyberAttackDataset/*.csv
 !spotify_wrap_2025/*.csv
 !netflix_titles/*.csv
+!UFC_EDA_ADVANCED/*.csv
 
 # Allow essential configuration files
 !.gitignore
