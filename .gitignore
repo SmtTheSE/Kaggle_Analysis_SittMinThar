@@ -1,0 +1,37 @@
+# --- GLOBAL IGNORE ---
+# Ignore everything by default
+/*
+
+# --- SYSTEM & TEMP (Ignore first) ---
+**/.DS_Store
+**/__pycache__/
+**/.ipynb_checkpoints/
+**/node_modules/
+**/venv/
+**/env/
+**/.streamlit/
+**/*.csv
+
+# --- PROJECT WHITELIST (Last patterns win) ---
+# Allow the master hub and the four showcase project folders
+!streamlit_showcase/
+!nvidia_stock_analysis/
+!Top_100_Population/
+!bmw_sales/
+!cyberattack-dataset/
+!spotify_wrap_2025/
+!netflix_titles/
+
+# --- DATASET WHITELIST ---
+# Specifically allow these datasets (Must be after global csv ignore)
+!nvidia_stock_analysis/*.csv
+!Top_100_Population/*.csv
+!bmw_sales/*.csv
+!cyberattack-dataset/CyberAttackDataset/*.csv
+!spotify_wrap_2025/*.csv
+!netflix_titles/*.csv
+
+# Allow essential configuration files
+!.gitignore
+!README.md
+!requirements.txt
