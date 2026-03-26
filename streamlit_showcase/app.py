@@ -150,7 +150,7 @@ def show_home():
         - **Cyberattack Telemetry**: [Threat attribution & network security forensic](https://www.kaggle.com/code/sittminthar/cyberattack-deep-analysis).
         - **Netflix Content Strategy**: [Release-to-addition latency & geographic dominance](https://www.kaggle.com/code/sittminthar/netflix-eda).
         - **Spotify Wrap 2025**: [Audio signatures & TikTok-driven song duration paradigms](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced).
-        - **UFC Advanced EDA**: [Combat analytics and fight finish archetypes](https://www.kaggle.com/code/sittminthar/ufc-eda-insights).
+        - **UFC Advanced EDA**: [Combat analytics and fight finish archetypes](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced).
         - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
         """)
     
@@ -457,7 +457,7 @@ def show_ufc(df):
         plt.xlabel("Total Fight Time (Seconds)")
         st.pyplot(fig)
 
-    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/ufc-eda-insights)")
+    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
 
     with st.expander("Combat Analytics Blueprint"):
         st.markdown('''
@@ -521,7 +521,7 @@ def main():
     st.sidebar.markdown("- [Cyberattack Analysis](https://www.kaggle.com/code/sittminthar/cyberattack-deep-analysis)")
     st.sidebar.markdown("- [Netflix Content Strategy](https://www.kaggle.com/code/sittminthar/netflix-eda)")
     st.sidebar.markdown("- [Spotify Wrap 2025](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced)")
-    st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-insights)")
+    st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
     
     st.sidebar.markdown("---")
