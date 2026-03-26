@@ -122,6 +122,13 @@ def load_ufc_data():
         df['Event_Date'] = pd.to_datetime(df['Event_Date'], errors='coerce')
     return df
 
+@st.cache_data
+def load_makeup_data():
+    df = pd.read_csv('Makeup_sale_2025/makeup_sales_dataset_2025.csv')
+    if 'Date' in df.columns:
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -144,6 +151,7 @@ def show_home():
         - **Netflix Content Strategy**: [Release-to-addition latency & geographic dominance](https://www.kaggle.com/code/sittminthar/netflix-eda).
         - **Spotify Wrap 2025**: [Audio signatures & TikTok-driven song duration paradigms](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced).
         - **UFC Advanced EDA**: [Combat analytics and fight finish archetypes](https://www.kaggle.com/code/sittminthar/ufc-eda-insights).
+        - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
         """)
     
     with col2:
@@ -457,11 +465,48 @@ def show_ufc(df):
         - **Duration Profiling**: Heavier weight classes exhibit significantly lower average fight times due to higher finishing power.
         ''')
 
+# --- PAGE: MAKEUP ---
+def show_makeup(df):
+    st.title("Global Cosmetic Commerce: Strategic Analytics")
+    st.caption("High-Fidelity Evaluation of Elite Makeup Retail Distribution")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Total Revenue Transacted", f"${df['Revenue_USD'].sum()/1_000_000:.2f}M")
+    m2.metric("Total Units Dispatched", f"{df['Units_Sold'].sum():,}")
+    m3.metric("Top Revenue Brand", df.groupby('Brand')['Revenue_USD'].sum().idxmax())
+    m4.metric("Avg Product Margin", f"${df['Price_USD'].mean():.2f}")
+
+    tab1, tab2 = st.tabs(["Brand Positioning", "Omnichannel Velocity"])
+    
+    with tab1:
+        st.write("#### Brand Prestige & Market Penetration")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        brand_rev = df.groupby('Brand')['Revenue_USD'].sum().sort_values(ascending=False)
+        sns.barplot(x=brand_rev.values, y=brand_rev.index, palette="flare", ax=ax)
+        plt.title("Revenue Concentration by Brand", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Digital Conversion Mechanisms")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        payment_sales = df.groupby('Payment_Method')['Revenue_USD'].sum().sort_values()
+        sns.barplot(x=payment_sales.index, y=payment_sales.values, palette="magma", ax=ax)
+        plt.title("Cart-Clearing Capital by Payment Pipeline", fontweight='bold')
+        st.pyplot(fig)
+
+    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
+
+    with st.expander("Strategic Industry Blueprint"):
+        st.markdown('''
+        - **Digital Infrastructure Dominance**: Omnichannel distribution displays massive clearing velocity via Digital Wallets.
+        - **The 'Prestige Valuation Gap'**: Dominant brands exhibit rigid pricing architecture that shields high-margin products from volume dilution.
+        ''')
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -477,6 +522,7 @@ def main():
     st.sidebar.markdown("- [Netflix Content Strategy](https://www.kaggle.com/code/sittminthar/netflix-eda)")
     st.sidebar.markdown("- [Spotify Wrap 2025](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced)")
     st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-insights)")
+    st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -511,6 +557,9 @@ def main():
     elif page == "UFC Advanced EDA":
         df = load_ufc_data()
         show_ufc(df)
+    elif page == "Global Cosmetic Commerce":
+        df = load_makeup_data()
+        show_makeup(df)
 
 if __name__ == "__main__":
     main()
