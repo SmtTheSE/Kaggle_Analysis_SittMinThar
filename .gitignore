@@ -23,6 +23,7 @@
 !netflix_titles/
 !UFC_EDA_ADVANCED/
 !Makeup_sale_2025/
+!oscar_sount_track1934_2026/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -34,6 +35,7 @@
 !netflix_titles/*.csv
 !UFC_EDA_ADVANCED/*.csv
 !Makeup_sale_2025/*.csv
+!oscar_sount_track1934_2026/*.csv
 
 # Allow essential configuration files
 !.gitignore

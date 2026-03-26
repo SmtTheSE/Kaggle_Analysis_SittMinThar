@@ -129,6 +129,11 @@ def load_makeup_data():
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
     return df
 
+@st.cache_data
+def load_oscar_data():
+    df = pd.read_csv('oscar_sount_track1934_2026/oscar_best_score_complete_1934_2026.csv')
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -152,6 +157,7 @@ def show_home():
         - **Spotify Wrap 2025**: [Audio signatures & TikTok-driven song duration paradigms](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced).
         - **UFC Advanced EDA**: [Combat analytics and fight finish archetypes](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced).
         - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
+        - **Oscar Soundtrack History**: [Composer dynasties and cinematic excellence](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda).
         """)
     
     with col2:
@@ -502,11 +508,51 @@ def show_makeup(df):
         - **The 'Prestige Valuation Gap'**: Dominant brands exhibit rigid pricing architecture that shields high-margin products from volume dilution.
         ''')
 
+# --- PAGE: OSCARS ---
+def show_oscar(df):
+    st.title("Cinematic Excellence: The Academy Awards")
+    st.caption("Statistical Evaluation of Best Original Score Dominance (1934–2026)")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Total Historical Awards", f"{len(df)}")
+    m2.metric("Unique Composers", f"{df['Composer'].nunique()}")
+    m3.metric("Most Awarded Composer", f"{df['Composer'].mode()[0]}")
+    m4.metric("Oldest Monitored Year", f"{df['Year'].min()}")
+
+    tab1, tab2 = st.tabs(["Composer Dominance Hierarchy", "Epoch Centralization"])
+    
+    with tab1:
+        st.write("#### The Maestro Hierarchy (Top Awarded Composers)")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        top_composers = df['Composer'].value_counts().head(10)
+        sns.barplot(x=top_composers.values, y=top_composers.index, palette="mako", ax=ax)
+        plt.title("Statistical Monopoly on Original Scores", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Era-Based Distribution Index")
+        df['Decade'] = (df['Year'] // 10) * 10
+        fig, ax = plt.subplots(figsize=(10, 6))
+        decade_counts = df.groupby('Decade').size()
+        sns.lineplot(x=decade_counts.index, y=decade_counts.values, marker='o', color="#F06292", linewidth=3, ax=ax)
+        plt.fill_between(decade_counts.index, decade_counts.values, color="#F06292", alpha=0.2)
+        plt.title("Award Frequency Validation Over Cinematic History", fontweight='bold')
+        plt.grid(axis='y', linestyle='--', alpha=0.3)
+        st.pyplot(fig)
+
+    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda)")
+
+    with st.expander("Strategic Composer Blueprint"):
+        st.markdown('''
+        - **The Dynasty Monopoly**: A extreme minor percentage of composers possess highly disproportionate centralizations of historical wins.
+        - **Generational Bridging**: Elite maestros transcend their original cinematic decade to continually dominate the Academy Award selection circuit.
+        ''')
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -523,6 +569,7 @@ def main():
     st.sidebar.markdown("- [Spotify Wrap 2025](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced)")
     st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
+    st.sidebar.markdown("- [Oscar Soundtrack History](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -560,6 +607,9 @@ def main():
     elif page == "Global Cosmetic Commerce":
         df = load_makeup_data()
         show_makeup(df)
+    elif page == "Oscar Soundtrack History":
+        df = load_oscar_data()
+        show_oscar(df)
 
 if __name__ == "__main__":
     main()
