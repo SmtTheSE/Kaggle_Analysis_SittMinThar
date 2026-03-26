@@ -237,9 +237,109 @@ plt.show()
 """))
 
 # ---------------------------------------------------------
-# Section 7: Final Blueprint
+# Section 7: The "New Blood" Index
 # ---------------------------------------------------------
-nb.cells.append(nbf.v4.new_markdown_cell("""## 7. Advanced Findings & Quantitative Industry Blueprint
+nb.cells.append(nbf.v4.new_markdown_cell("""## 7. The 'New Blood' Index: Academy Diversity Over Time
+Does the Academy favor the old guard, or are they increasingly rewarding new talent? We measure the number of unique composers awarded per decade."""))
+
+nb.cells.append(nbf.v4.new_code_cell("""# Unique Composers per Decade
+diversity = df.groupby('Decade')['Composer'].nunique().reset_index()
+
+fig, ax = plt.subplots(figsize=(14, 6))
+sns.barplot(x='Decade', y='Composer', data=diversity, palette="viridis", ax=ax)
+ax.set_title("The 'New Blood' Index: Unique Composers Awarded per Decade", fontweight='bold', fontsize=14)
+ax.set_ylabel("Count of Distinct Winners")
+ax.set_xlabel("Cinematic Decade")
+
+for p in ax.patches:
+    ax.annotate(f'{int(p.get_height())}', 
+                (p.get_x() + p.get_width() / 2., p.get_height()), 
+                ha='center', va='center', xytext=(0, 8), 
+                textcoords='offset points', fontsize=11, fontweight='bold', color=TEXT_WHITE)
+
+plt.grid(axis='y', linestyle='--', alpha=0.3)
+plt.show()
+"""))
+
+# ---------------------------------------------------------
+# Section 8: The Rise of Collaborative Scoring
+# ---------------------------------------------------------
+nb.cells.append(nbf.v4.new_markdown_cell("""## 8. The Rise of Collaborative Scoring
+Historically, film scoring was a solitary massive effort by a single maestro. Today, collaboration is rising. We track the frequency of shared Academy Awards (multiple composers on one film)."""))
+
+nb.cells.append(nbf.v4.new_code_cell("""# Identify Collaborative Scores (contains ' and ', '&', or ',')
+df['Is_Collaborative'] = df['Composer'].str.contains(' and | & |,', regex=True).astype(int)
+collab_trend = df.groupby('Decade')['Is_Collaborative'].sum().reset_index()
+
+fig, ax = plt.subplots(figsize=(12, 5))
+sns.lineplot(x='Decade', y='Is_Collaborative', data=collab_trend, marker='X', markersize=12, linewidth=3, color=VIBRANT_GOLD, ax=ax)
+ax.fill_between(collab_trend['Decade'], collab_trend['Is_Collaborative'], color=VIBRANT_GOLD, alpha=0.1)
+ax.set_title("The Death of the Soloist? Rise of Collaborative Best Scores", fontweight='bold', fontsize=14)
+ax.set_ylabel("Number of Shared Awards")
+ax.grid(axis='y', linestyle='--', alpha=0.3)
+plt.show()
+"""))
+
+# ---------------------------------------------------------
+# Section 9: The Back-to-Back Phenomenon
+# ---------------------------------------------------------
+nb.cells.append(nbf.v4.new_markdown_cell("""## 9. The Back-to-Back Phenomenon (Consecutive Victories)
+Winning two Academy Awards in consecutive years is a literal statistical anomaly. Who achieved the ultimate Back-to-Back?"""))
+
+nb.cells.append(nbf.v4.new_code_cell("""# Identify Consecutive Wins
+df_sorted = df.sort_values(by=['Composer', 'Year'])
+df_sorted['Prev_Year'] = df_sorted.groupby('Composer')['Year'].shift(1)
+df_sorted['Consecutive'] = (df_sorted['Year'] - df_sorted['Prev_Year']) == 1
+
+b2b_winners = df_sorted[df_sorted['Consecutive']]
+
+print("THE ELITE BACK-TO-BACK WINNERS IN OSCAR HISTORY:")
+print("-" * 60)
+for index, row in b2b_winners.iterrows():
+    print(f"🏆 {row['Composer']} won in {int(row['Prev_Year'])} and {row['Year']} ({row['Film']})")
+print("-" * 60)
+"""))
+
+# ---------------------------------------------------------
+# Section 10: Top Cinematic Vocabulary
+# ---------------------------------------------------------
+nb.cells.append(nbf.v4.new_markdown_cell("""## 10. Cinematic Keyword Vocabulary
+A linguistic extraction of the most frequently occurring words in Best Score winning film titles."""))
+
+nb.cells.append(nbf.v4.new_code_cell("""from collections import Counter
+import re
+
+# Clean and tokenize titles
+stopwords = {'the', 'of', 'and', 'in', 'a', 'to', 'for', 'is', 'on', 'with', 'by', 'an'}
+all_words = []
+for title in df['Film'].dropna():
+    words = re.findall(r'\\b[a-z]+\\b', str(title).lower())
+    all_words.extend([w for w in words if w not in stopwords])
+
+# Get top 15 words
+word_counts = Counter(all_words).most_common(15)
+words_df = pd.DataFrame(word_counts, columns=['Keyword', 'Frequency'])
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(x='Frequency', y='Keyword', data=words_df, palette="crest", ax=ax)
+ax.set_title("Top 15 Most Frequent Keywords in Winning Titles", fontweight='bold', fontsize=14)
+ax.set_xlabel("Frequency (Excluding Stopwords)")
+ax.set_ylabel("")
+
+for p in ax.patches:
+    ax.annotate(f'{int(p.get_width())}', 
+                (p.get_width(), p.get_y() + p.get_height() / 2.), 
+                ha='left', va='center', xytext=(5, 0), 
+                textcoords='offset points', fontsize=11, fontweight='bold', color=TEXT_WHITE)
+
+plt.tight_layout()
+plt.show()
+"""))
+
+# ---------------------------------------------------------
+# Section 11: Final Blueprint
+# ---------------------------------------------------------
+nb.cells.append(nbf.v4.new_markdown_cell("""## 11. Advanced Findings & Quantitative Industry Blueprint
 ### Data-Driven Synthesis for Global Cinematic Excellence
 
 **Authored by Lead Analyst Sitt Min Thar**
