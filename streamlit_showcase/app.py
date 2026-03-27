@@ -735,7 +735,7 @@ def main():
     st.sidebar.markdown("- [Spotify Wrap 2025](https://www.kaggle.com/code/sittminthar/spotify-wrap-2025-eda-advanced)")
     st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
-    st.sidebar.markdown("- [Oscar Soundtrack History](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda)")
+    st.sidebar.markdown("- [Oscar Cinematic Excellence](https://www.kaggle.com/code/sittminthar/oscar-cinematic-excellence-the-academy-awards)")
     st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
     
     st.sidebar.markdown("---")
