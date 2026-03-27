@@ -712,7 +712,7 @@ def show_autism(df):
         except Exception as e:
             st.error(f"Error initializing prediction engine: {str(e)}")
 
-    st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/autism-spectrum-ai-elite-v2)")
+    st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
 
 # --- NAVIGATION ---
 def main():
@@ -736,7 +736,7 @@ def main():
     st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
     st.sidebar.markdown("- [Oscar Soundtrack History](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda)")
-    st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/autism-spectrum-ai-elite-v2)")
+    st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
