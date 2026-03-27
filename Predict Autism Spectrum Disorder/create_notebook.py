@@ -63,9 +63,14 @@ plt.rcParams.update({
     "font.size": 11
 })
 
-# Load Dataset
+# Load Dataset & Cleanse Outliers (Age 380+ cleaning)
 df = pd.read_csv('Autism.csv')
 df.replace('?', np.nan, inplace=True)
+
+# Cast age to numeric and remove extreme 300yr+ outliers
+df['age'] = pd.to_numeric(df['age'], errors='coerce')
+df = df[df['age'] <= 100] # Valid human age constraint
+
 df.head()
 """))
 
@@ -73,22 +78,36 @@ df.head()
 # Section 2: Advanced Clinical EDA
 # ---------------------------------------------------------
 nb.cells.append(nbf.v4.new_markdown_cell("""## 2. Advanced Clinical Phenotyping (EDA)
-Exploring the inter-dependence of clinical questions and demographic indicators through high-density heatmaps and bivariate distributions."""))
+Exploring the inter-dependence of clinical questions and demographic indicators through high-density heatmaps and smooth density distributions."""))
 
-nb.cells.append(nbf.v4.new_code_cell("""fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+nb.cells.append(nbf.v4.new_code_cell("""# High-Fidelity Multi-Panel Analytics
+fig = plt.figure(figsize=(18, 12))
+gs = fig.add_gridspec(2, 2)
 
 # 2.1 Clinical Correlation Matrix
-# Only AQ Scores and Result
+ax1 = fig.add_subplot(gs[0, 0])
 clinical_cols = [f'A{i}_Score' for i in range(1, 11)] + ['result']
 corr_matrix = df[clinical_cols].corr()
+sns.heatmap(corr_matrix, annot=True, cmap="mako", ax=ax1, cbar_kws={'label': 'Correlation Coefficient'})
+ax1.set_title("AQ-10 Clinical Test Correlation Matrix", fontweight='bold')
 
-sns.heatmap(corr_matrix, annot=True, cmap="mako", ax=axes[0], cbar_kws={'label': 'Correlation Coefficient'})
-axes[0].set_title("AQ-10 Clinical Test Correlation Matrix", fontweight='bold')
+# 2.2 ASD Diagnosis by Congenital Jaundice (Normalized Bar)
+ax2 = fig.add_subplot(gs[0, 1])
+jaundice_tab = pd.crosstab(df['jundice'], df['Class/ASD'], normalize='index') * 100
+jaundice_tab.plot(kind='bar', stacked=True, color=[VIBRANT_CYAN, VIBRANT_PINK], ax=ax2, edgecolor=DARK_BG)
+ax2.set_title("Clinical Marker: Congenital Jaundice vs ASD Result", fontweight='bold')
+ax2.set_ylabel("Probability (%)")
+ax2.set_xlabel("History of Jaundice")
+ax2.legend(title="ASD Identified")
 
-# 2.2 Age vs Jaundice vs ASD (Advanced Violin)
-df['age'] = pd.to_numeric(df['age'], errors='coerce')
-sns.violinplot(data=df, x='jundice', y='age', hue='Class/ASD', split=True, palette='flare', ax=axes[1])
-axes[1].set_title("Age Distribution: Congenital Jaundice x ASD Outcome", fontweight='bold')
+# 2.3 Age-Specific Density (Smooth KDE)
+ax3 = fig.add_subplot(gs[1, :])
+sns.kdeplot(data=df[df['Class/ASD']=='NO'], x='age', fill=True, color=VIBRANT_CYAN, label='ASD Negative', alpha=0.3, ax=ax3)
+sns.kdeplot(data=df[df['Class/ASD']=='YES'], x='age', fill=True, color=VIBRANT_PINK, label='ASD Positive', alpha=0.4, ax=ax3)
+ax3.set_title("Phenotypic Age Density: Diagnostic Spikes across Lifecycle", fontweight='bold')
+ax3.set_xlabel("Patient Age (Years)")
+ax3.set_ylabel("Density Distribution")
+ax3.legend()
 
 plt.tight_layout()
 plt.show()
