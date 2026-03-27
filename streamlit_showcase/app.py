@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.gridspec as gridspec
+import xgboost as xgb
+import json
+import os
 from datetime import datetime
 
 # --- ELITE CONFIGURATION ---
@@ -573,7 +576,7 @@ def show_autism(df):
     m3.metric("AI Engine", "XGBoost + SHAP")
     m4.metric("K-Fold AUC", "1.0000")
 
-    tab1, tab2, tab3 = st.tabs(["Clinical Phenotypes", "Model Calibration", "Diagnostic Explainability (SHAP)"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Clinical Phenotypes", "Model Calibration", "Diagnostic Explainability", "Interactive Prediction Tool"])
     
     with tab1:
         st.write("#### Clinical Demographic Distribution")
@@ -634,7 +637,78 @@ def show_autism(df):
         st.markdown("---")
         st.write("##### Sample Patient Trace (Local Explainability)")
         st.image("https://raw.githubusercontent.com/slundberg/shap/master/docs/artwork/iris_force_plot.png", caption="Example of SHAP Local Force Plot Diagnostic", width=700)
-        st.info("The full V2 Notebook includes interactive Force Plots for every individual patient record.")
+
+    with tab4:
+        st.write("#### Live Diagnostic Inference Tool")
+        st.warning("DISCLAIMER: This is a professional data science demonstration. It is NOT a clinical diagnosis tool. Always consult a medical professional.")
+        
+        # Load Model & Metadata
+        try:
+            model_path = 'Predict Autism Spectrum Disorder/autism_model.json'
+            meta_path = 'Predict Autism Spectrum Disorder/model_metadata.json'
+            
+            if not os.path.exists(model_path):
+                st.error("Model assets not found. Please ensure export_model.py has been run.")
+            else:
+                xgb_model = xgb.XGBClassifier()
+                xgb_model.load_model(model_path)
+                with open(meta_path, 'r') as f:
+                    meta = json.load(f)
+                
+                with st.form("diagnostic_form"):
+                    st.write("##### Patient Clinical Indicators (AQ-10)")
+                    aq_cols = st.columns(5)
+                    a_scores = []
+                    for i in range(1, 11):
+                        with aq_cols[(i-1)%5]:
+                            val = st.toggle(f"AQ-{i} Positive", key=f"a{i}")
+                            a_scores.append(1 if val else 0)
+                    
+                    st.write("##### Demographic & History")
+                    c1, c2, c3 = st.columns(3)
+                    age = c1.slider("Age", 0, 100, 25)
+                    gender = c2.selectbox("Gender", meta['classes']['gender'])
+                    jaundice = c3.selectbox("History of Jaundice", meta['classes']['jundice'])
+                    
+                    c4, c5 = st.columns(2)
+                    ethnicity = c4.selectbox("Ethnicity", meta['classes']['ethnicity'])
+                    relation = c5.selectbox("Relation (Who took test?)", meta['classes']['relation'])
+                    
+                    submitted = st.form_submit_button("RUN DIAGNOSTIC INFERENCE")
+                    
+                    if submitted:
+                        # Preprocess Input to Match Training Features
+                        input_dict = {
+                            'A1_Score': a_scores[0], 'A2_Score': a_scores[1], 'A3_Score': a_scores[2],
+                            'A4_Score': a_scores[3], 'A5_Score': a_scores[4], 'A6_Score': a_scores[5],
+                            'A7_Score': a_scores[6], 'A8_Score': a_scores[7], 'A9_Score': a_scores[8],
+                            'A10_Score': a_scores[9], 'age': age, 
+                            'gender': meta['classes']['gender'].index(gender),
+                            'ethnicity': meta['classes']['ethnicity'].index(ethnicity),
+                            'jundice': meta['classes']['jundice'].index(jaundice),
+                            'austim': 0, # Placeholder (standard for these datasets)
+                            'contry_of_res': 0, # Simplified for demo
+                            'relation': meta['classes']['relation'].index(relation)
+                        }
+                        
+                        # Ensure features are in exact order as training
+                        input_df = pd.DataFrame([input_dict])[meta['features']]
+                        
+                        # Inference
+                        prob = xgb_model.predict_proba(input_df)[0][1]
+                        pred = "POSITIVE" if prob > 0.5 else "NEGATIVE"
+                        
+                        res_col1, res_col2 = st.columns(2)
+                        res_col1.metric("Diagnostic Prediction", pred, delta=f"{prob*100:.1f}% confidence")
+                        res_col2.progress(prob, text=f"ASD Presentation Probability: {prob*100:.1f}%")
+                        
+                        if prob > 0.5:
+                            st.error(f"High Clinical Probability Detected: {prob*100:.1f}%")
+                        else:
+                            st.success(f"Low Clinical Probability: {prob*100:.1f}%")
+
+        except Exception as e:
+            st.error(f"Error initializing prediction engine: {str(e)}")
 
     st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/autism-spectrum-ai-elite-v2)")
 
