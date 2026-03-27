@@ -35,8 +35,8 @@ model = xgb.XGBClassifier(
 model.fit(X, y)
 
 # 4. Save Assets
-# Save model to JSON (XGBoost standard)
-model.save_model('autism_model.json')
+# Save as Booster (bypasses sklearn requirement for inference)
+model.get_booster().save_model('autism_model.bin')
 
 # Save encoders and feature names for the app
 metadata = {
@@ -48,4 +48,4 @@ metadata = {
 with open('model_metadata.json', 'w') as f:
     json.dump(metadata, f)
 
-print("Production Assets Exported: autism_model.json, model_metadata.json")
+print("Production Assets Exported: autism_model.bin/json, model_metadata.json")

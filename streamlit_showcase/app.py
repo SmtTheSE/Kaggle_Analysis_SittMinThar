@@ -635,8 +635,8 @@ def show_autism(df):
         st.pyplot(fig)
         
         st.markdown("---")
-        st.write("##### Sample Patient Trace (Local Explainability)")
-        st.image("https://raw.githubusercontent.com/slundberg/shap/master/docs/artwork/iris_force_plot.png", caption="Example of SHAP Local Force Plot Diagnostic", width=700)
+        st.write("##### Explainability Metric")
+        st.info("The V2 Research Notebook contains the full interactive SHAP Force Plot suite for every patient case. In this dashboard, we prioritize global attribution stability.")
 
     with tab4:
         st.write("#### Live Diagnostic Inference Tool")
@@ -644,14 +644,15 @@ def show_autism(df):
         
         # Load Model & Metadata
         try:
-            model_path = 'Predict Autism Spectrum Disorder/autism_model.json'
+            model_path = 'Predict Autism Spectrum Disorder/autism_model.bin'
             meta_path = 'Predict Autism Spectrum Disorder/model_metadata.json'
             
             if not os.path.exists(model_path):
                 st.error("Model assets not found. Please ensure export_model.py has been run.")
             else:
-                xgb_model = xgb.XGBClassifier()
-                xgb_model.load_model(model_path)
+                # Use Booster to avoid sklearn dependency in some environments
+                bst = xgb.Booster()
+                bst.load_model(model_path)
                 with open(meta_path, 'r') as f:
                     meta = json.load(f)
                 
@@ -694,8 +695,9 @@ def show_autism(df):
                         # Ensure features are in exact order as training
                         input_df = pd.DataFrame([input_dict])[meta['features']]
                         
-                        # Inference
-                        prob = xgb_model.predict_proba(input_df)[0][1]
+                        # Booster Inference (Predicts probabilities by default for binary)
+                        dtest = xgb.DMatrix(input_df)
+                        prob = float(bst.predict(dtest)[0])
                         pred = "POSITIVE" if prob > 0.5 else "NEGATIVE"
                         
                         res_col1, res_col2 = st.columns(2)
