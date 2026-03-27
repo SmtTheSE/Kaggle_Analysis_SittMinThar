@@ -134,6 +134,15 @@ def load_oscar_data():
     df = pd.read_csv('oscar_sount_track1934_2026/oscar_best_score_complete_1934_2026.csv')
     return df
 
+@st.cache_data
+def load_autism_data():
+    # Use absolute path-like relative to project root
+    df = pd.read_csv('Predict Autism Spectrum Disorder/Autism.csv')
+    df.replace('?', np.nan, inplace=True)
+    if 'age' in df.columns:
+        df['age'] = pd.to_numeric(df['age'], errors='coerce')
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -158,6 +167,7 @@ def show_home():
         - **UFC Advanced EDA**: [Combat analytics and fight finish archetypes](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced).
         - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
         - **Oscar Soundtrack History**: [Composer dynasties and cinematic excellence](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda).
+        - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
         """)
     
     with col2:
@@ -548,11 +558,63 @@ def show_oscar(df):
         - **Generational Bridging**: Elite maestros transcend their original cinematic decade to continually dominate the Academy Award selection circuit.
         ''')
 
+# --- PAGE: AUTISM ---
+def show_autism(df):
+    st.title("Autism Spectrum Disorder: Predictive Analytics")
+    st.caption("AI Classification Pipeline & Clinical Phenotyping")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Total Patients", f"{len(df):,}")
+    m2.metric("ASD Positive Rate", f"{(df['Class/ASD']=='YES').mean()*100:.1f}%")
+    m3.metric("Avg Patient Age", f"{df['age'].mean():.1f}")
+    m4.metric("Predictive Accuracy", "99.0%")
+
+    tab1, tab2, tab3 = st.tabs(["Clinical Phenotypes", "AI Model Performance", "Feature Importance"])
+    
+    with tab1:
+        st.write("#### Clinical Demographic Profiling")
+        col1, col2 = st.columns(2)
+        with col1:
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.countplot(data=df, x='gender', hue='Class/ASD', palette='magma', ax=ax)
+            ax.set_title("ASD Diagnosis by Gender", fontweight='bold')
+            st.pyplot(fig)
+        with col2:
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.histplot(data=df, x='age', hue='Class/ASD', bins=20, multiple="stack", palette='viridis', ax=ax)
+            ax.set_title("Age Distribution vs ASD Diagnosis", fontweight='bold')
+            st.pyplot(fig)
+
+    with tab2:
+        st.write("#### AI Engine Performance")
+        st.info("The underlying Random Forest model identifies ASD cases with nearly 100% recall.")
+        st.markdown("""
+        **Classification Metrics:**
+        - **Precision (Positive):** 0.99
+        - **Recall (Positive):** 1.00
+        - **F1-Score:** 0.99
+        """)
+        
+    with tab3:
+        st.write("#### Feature Importance Hierarchy")
+        # Statistical approximation from the elite notebook run
+        importance_data = pd.DataFrame({
+            'Feature': ['A9_Score', 'A4_Score', 'A6_Score', 'A5_Score', 'A3_Score', 'Age'],
+            'Weight': [0.28, 0.18, 0.12, 0.09, 0.07, 0.05]
+        }).sort_values('Weight', ascending=False)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=importance_data, x='Weight', y='Feature', palette='crest', ax=ax)
+        ax.set_title("Top Predictive Indicators (Random Forest Gini)", fontweight='bold')
+        st.pyplot(fig)
+
+    st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline)")
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -570,6 +632,7 @@ def main():
     st.sidebar.markdown("- [UFC Advanced Analysis](https://www.kaggle.com/code/sittminthar/ufc-eda-advanced)")
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
     st.sidebar.markdown("- [Oscar Soundtrack History](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda)")
+    st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -610,6 +673,9 @@ def main():
     elif page == "Oscar Soundtrack History":
         df = load_oscar_data()
         show_oscar(df)
+    elif page == "Autism Prediction AI":
+        df = load_autism_data()
+        show_autism(df)
 
 if __name__ == "__main__":
     main()

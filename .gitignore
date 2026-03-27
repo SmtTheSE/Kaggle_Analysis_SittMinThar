@@ -24,6 +24,7 @@
 !UFC_EDA_ADVANCED/
 !Makeup_sale_2025/
 !oscar_sount_track1934_2026/
+!Predict Autism Spectrum Disorder/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -36,6 +37,7 @@
 !UFC_EDA_ADVANCED/*.csv
 !Makeup_sale_2025/*.csv
 !oscar_sount_track1934_2026/*.csv
+!Predict Autism Spectrum Disorder/*.csv
 
 # Allow essential configuration files
 !.gitignore
