@@ -225,7 +225,7 @@ nb.cells.append(nbf.v4.new_markdown_cell("""## 7. Advanced AI Synthesis & Clinic
 """))
 
 # Save Notebook
-file_path = 'autism_prediction_elite_pipeline.ipynb'
+file_path = 'autism_spectrum_ai_elite_v2.ipynb'
 with open(file_path, 'w') as f:
     nbf.write(nb, f)
 print(f"XGBoost Pipeline Successfully Built -> {file_path}")
