@@ -612,7 +612,7 @@ def show_autism(df):
         ax.set_title("Feature Contribution Matrix (SHAP)", fontweight='bold')
         st.pyplot(fig)
 
-    st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline)")
+    st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/autism-spectrum-ai-elite-v2)")
 
 # --- NAVIGATION ---
 def main():
