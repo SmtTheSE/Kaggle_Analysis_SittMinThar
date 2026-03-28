@@ -192,7 +192,7 @@ def show_home():
         - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
         - **Oncology Strategic Analysis**: [Global survival disparities & screening efficacy](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
         - **AI Job Market Analysis**: [Global employment telemetry & compensation benchmarks](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
-        - **GitHub Architecture**: [Top repository ecosystems & engagement scaling](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda).
+        - **GitHub Architecture**: [Top repository ecosystems & engagement scaling](https://www.kaggle.com/code/sittminthar/github-repositories-analysis).
         """)
     
     with col2:
@@ -921,7 +921,7 @@ def show_github_repos(df):
             top_repos = df.sort_values('Stars Count', ascending=False)[['Repository Name', 'Domain', 'Stars Count', 'Primary Language']].head(10)
             st.dataframe(top_repos, use_container_width=True)
 
-    st.markdown("[Explore Full Visual Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda)")
+    st.markdown("[Explore Full Visual Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/github-repositories-analysis)")
 
 # --- NAVIGATION ---
 def main():
@@ -948,7 +948,7 @@ def main():
     st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
     st.sidebar.markdown("- [Breast Cancer Strategic EDA](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
     st.sidebar.markdown("- [AI Job Market Analysis](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis)")
-    st.sidebar.markdown("- [GitHub Repos Architecture](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda)")
+    st.sidebar.markdown("- [GitHub Repos Architecture](https://www.kaggle.com/code/sittminthar/github-repositories-analysis)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
