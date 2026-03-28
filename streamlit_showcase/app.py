@@ -154,6 +154,13 @@ def load_breast_cancer_data():
     return country_df, survival_df, risk_df
 
 @st.cache_data
+def load_github_repos_data():
+    df = pd.read_csv('github_top_repos/github_top_repositories.csv')
+    for col in ['Created At', 'Updated At', 'Pushed At']:
+        df[col] = pd.to_datetime(df[col], utc=True)
+    return df
+
+@st.cache_data
 def load_ai_job_data():
     df = pd.read_csv('AI_JOB_Market_Analysis/AI Job Market Dataset.csv')
     return df
@@ -185,6 +192,7 @@ def show_home():
         - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
         - **Oncology Strategic Analysis**: [Global survival disparities & screening efficacy](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
         - **AI Job Market Analysis**: [Global employment telemetry & compensation benchmarks](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
+        - **GitHub Architecture**: [Top repository ecosystems & engagement scaling](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda).
         """)
     
     with col2:
@@ -857,11 +865,69 @@ def show_ai_job_market(df):
 
     st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis)")
 
+# --- PAGE: GITHUB REPOSITORY ANALYSIS ---
+def show_github_repos(df):
+    st.title("GitHub Architecture: Top Repository Ecosystems")
+    st.caption("Strategic Evaluation of the World's Most Impactful Open Source Projects")
+    st.image("https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80", use_container_width=True)
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Indexed Repositories", f"{len(df):,}")
+    m2.metric("Primary Language", df['Primary Language'].mode()[0])
+    m3.metric("Avg Stars Count", f"{df['Stars Count'].mean():,.0f}")
+    m4.metric("Unique Domains", df['Domain'].nunique())
+
+    tab1, tab2, tab3 = st.tabs(["Language & Domain Ecosystem", "Engagement Insights", "Structural Metrics"])
+
+    with tab1:
+        st.write("#### Global Language & Domain Distribution")
+        col1, col2 = st.columns(2)
+        with col1:
+            lang_counts = df['Primary Language'].value_counts().head(12)
+            fig, ax = plt.subplots(figsize=(10, 8))
+            sns.barplot(x=lang_counts.values, y=lang_counts.index, palette='magma', ax=ax)
+            ax.set_title("Programming Language Dominance", fontweight='bold')
+            st.pyplot(fig)
+        with col2:
+            domain_counts = df['Domain'].value_counts()
+            fig, ax = plt.subplots(figsize=(10, 8))
+            sns.barplot(x=domain_counts.values, y=domain_counts.index, palette='rocket', ax=ax)
+            ax.set_title("Repository Domain Specialization", fontweight='bold')
+            st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Star-to-Fork Acceleration Architecture")
+        fig, ax = plt.subplots(figsize=(12, 7))
+        # Use context to ensure visibility
+        sns.scatterplot(data=df, x='Stars Count', y='Forks Count', hue='Domain', 
+                        alpha=0.6, palette='flare', size='Size (KB)', sizes=(20, 200), ax=ax)
+        ax.set_title("Engagement Scaling Matrix", fontweight='bold')
+        plt.grid(alpha=0.1)
+        st.pyplot(fig)
+        st.info("The correlation between Stars and Forks reveals high structural utility in specialized domains.")
+
+    with tab3:
+        st.write("#### License & Resource Allocation")
+        col1, col2 = st.columns([1, 1.5])
+        with col1:
+            license_counts = df['License'].value_counts().head(8)
+            fig, ax = plt.subplots(figsize=(8, 8))
+            plt.pie(license_counts, labels=license_counts.index, autopct='%1.1f%%', 
+                    colors=sns.color_palette('magma'), startangle=140, wedgeprops={'edgecolor': 'white'})
+            ax.set_title("Open Source Licensing Share", fontweight='bold')
+            st.pyplot(fig)
+        with col2:
+            st.write("#### Top 10 High-Growth Repositories")
+            top_repos = df.sort_values('Stars Count', ascending=False)[['Repository Name', 'Domain', 'Stars Count', 'Primary Language']].head(10)
+            st.dataframe(top_repos, use_container_width=True)
+
+    st.markdown("[Explore Full Visual Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda)")
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -882,6 +948,7 @@ def main():
     st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
     st.sidebar.markdown("- [Breast Cancer Strategic EDA](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
     st.sidebar.markdown("- [AI Job Market Analysis](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis)")
+    st.sidebar.markdown("- [GitHub Repos Architecture](https://www.kaggle.com/code/sittminthar/github-repos-strategic-eda)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -931,6 +998,9 @@ def main():
     elif page == "AI Job Market Analysis":
         df = load_ai_job_data()
         show_ai_job_market(df)
+    elif page == "GitHub Repository Architecture":
+        df = load_github_repos_data()
+        show_github_repos(df)
 
 if __name__ == "__main__":
     main()
