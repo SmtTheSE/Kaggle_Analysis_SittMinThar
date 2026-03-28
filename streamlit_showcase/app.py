@@ -146,6 +146,13 @@ def load_autism_data():
         df['age'] = pd.to_numeric(df['age'], errors='coerce')
     return df
 
+@st.cache_data
+def load_breast_cancer_data():
+    country_df = pd.read_csv('Breast_Cancer_EDA/breast_cancer_by_country.csv')
+    survival_df = pd.read_csv('Breast_Cancer_EDA/breast_cancer_survival_by_stage.csv')
+    risk_df = pd.read_csv('Breast_Cancer_EDA/breast_cancer_risk_factors.csv')
+    return country_df, survival_df, risk_df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -171,6 +178,7 @@ def show_home():
         - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
         - **Oscar Soundtrack History**: [Composer dynasties and cinematic excellence](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda).
         - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
+        - **Oncology Strategic Analysis**: [Global survival disparities & screening efficacy](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
         """)
     
     with col2:
@@ -714,11 +722,83 @@ def show_autism(df):
 
     st.markdown("[Explore Full AI Pipeline on Kaggle](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
 
+# --- PAGE: BREAST CANCER ---
+def show_breast_cancer(country_df, survival_df, risk_df):
+    st.title("Global Oncology: Breast Cancer Strategic Analysis")
+    st.caption("Technical Deep-Dive into Global Survival Disparities & Screening Efficacy (2022-2025)")
+    st.image("https://images.unsplash.com/photo-1579154235602-3c2c2abb3b8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80", use_container_width=True)
+
+    # Engineering metrics
+    country_df['MIR'] = country_df['Deaths_2022'] / country_df['New_Cases_2022']
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Global New Cases (2022)", f"{country_df['New_Cases_2022'].sum()/1_000_000:.1f}M")
+    m2.metric("Avg 5-Year Survival", f"{country_df['Five_Year_Survival_Pct'].mean():.1f}%")
+    m3.metric("Avg MIR Score", f"{country_df['MIR'].mean():.3f}")
+    m4.metric("Screening Coverage", f"{country_df['Mammography_Coverage_Pct'].mean():.1f}%")
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Infrastructure Efficacy", "Efficiency Frontier", "Survival Stratification", "Risk ROI Heatmap"])
+
+    with tab1:
+        st.write("#### Healthcare System Efficacy: Mortality-to-Incidence Ratio (MIR)")
+        mir_extremes = country_df.sort_values('MIR')
+        target_display = pd.concat([mir_extremes.head(10), mir_extremes.tail(10)])
+        fig, ax = plt.subplots(figsize=(10, 8))
+        sns.barplot(data=target_display, x='MIR', y='Country', palette="flare", ax=ax)
+        plt.axvline(0.40, color="#FFD700", linestyle='--', alpha=0.5, label='High-Risk Threshold')
+        plt.title("MIR: Deaths / Incidence Velocity", fontweight='bold', pad=20)
+        plt.xlabel("MIR Score", labelpad=15)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### The Oncology Efficiency Frontier")
+        fig, ax = plt.subplots(figsize=(10, 7))
+        sns.regplot(data=country_df, x='Incidence_Rate_Per_100K', y='Mortality_Rate_Per_100K', 
+                    scatter_kws={'s': 100, 'alpha': 0.6, 'color': '#00FFFF'}, 
+                    line_kws={'color': '#FF1493', 'lw': 2, 'ls': '--'}, ax=ax)
+        plt.title("Burden vs. Mortality Capture Efficiency", fontweight='bold', pad=20)
+        plt.xlabel("Incidence Rate (per 100K)", labelpad=15)
+        plt.ylabel("Mortality Rate (per 100K)", labelpad=15)
+        plt.subplots_adjust(top=0.9, bottom=0.15)
+        st.pyplot(fig)
+        st.info("Nations below the trend-line exhibit superior treatment capture success relative to their cancer burden.")
+
+    with tab3:
+        st.write("#### Longitudinal Survival Decay by Socioeconomic Stratum (Stage II)")
+        survival_melted = survival_df.melt(id_vars=['Stage', 'Income_Region'], 
+                                          value_vars=['One_Year_Survival_Pct', 'Five_Year_Survival_Pct', 'Ten_Year_Survival_Pct'],
+                                          var_name='Period', value_name='Survival_Pct')
+        survival_melted['Timeline_Years'] = survival_melted['Period'].map({'One_Year_Survival_Pct': 1, 'Five_Year_Survival_Pct': 5, 'Ten_Year_Survival_Pct': 10})
+        
+        fig, ax = plt.subplots(figsize=(12, 7))
+        sns.lineplot(data=survival_melted[survival_melted['Stage'] == 'Stage II'], 
+                     x='Timeline_Years', y='Survival_Pct', hue='Income_Region', 
+                     marker='o', linewidth=3, palette="spring", ax=ax)
+        plt.title("The 'Survival Cliff' Across Income Tiers", fontweight='bold', pad=20)
+        plt.xlabel("Years Post-Diagnosis", labelpad=15)
+        plt.ylabel("Survival Probability (%)", labelpad=15)
+        plt.ylim(0, 105)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab4:
+        st.write("#### Strategic ROI: Modifiable PAF Ranking")
+        lifestyle_df = risk_df[risk_df['Category'] == 'Lifestyle'].sort_values('Population_Attributable_Fraction_Pct')
+        fig, ax = plt.subplots(figsize=(10, 7))
+        sns.barplot(data=lifestyle_df, x='Population_Attributable_Fraction_Pct', y='Risk_Factor', palette='crest', ax=ax)
+        plt.title("Modifiable Risk Population Attribution", fontweight='bold', pad=20)
+        plt.xlabel("PAF Percentage (%)", labelpad=15)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -737,6 +817,7 @@ def main():
     st.sidebar.markdown("- [Makeup Sales Analytics](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced)")
     st.sidebar.markdown("- [Oscar Cinematic Excellence](https://www.kaggle.com/code/sittminthar/oscar-cinematic-excellence-the-academy-awards)")
     st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
+    st.sidebar.markdown("- [Breast Cancer Strategic EDA](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -780,6 +861,9 @@ def main():
     elif page == "Autism Prediction AI":
         df = load_autism_data()
         show_autism(df)
+    elif page == "Oncology Strategic Analysis":
+        c_df, s_df, r_df = load_breast_cancer_data()
+        show_breast_cancer(c_df, s_df, r_df)
 
 if __name__ == "__main__":
     main()
