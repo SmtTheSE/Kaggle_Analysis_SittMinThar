@@ -153,6 +153,11 @@ def load_breast_cancer_data():
     risk_df = pd.read_csv('Breast_Cancer_EDA/breast_cancer_risk_factors.csv')
     return country_df, survival_df, risk_df
 
+@st.cache_data
+def load_ai_job_data():
+    df = pd.read_csv('AI_JOB_Market_Analysis/AI Job Market Dataset.csv')
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -179,6 +184,7 @@ def show_home():
         - **Oscar Soundtrack History**: [Composer dynasties and cinematic excellence](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda).
         - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
         - **Oncology Strategic Analysis**: [Global survival disparities & screening efficacy](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
+        - **AI Job Market Analysis**: [Global employment telemetry & compensation benchmarks](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
         """)
     
     with col2:
@@ -794,11 +800,68 @@ def show_breast_cancer(country_df, survival_df, risk_df):
 
     st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
 
+# --- PAGE: AI JOB MARKET ---
+def show_ai_job_market(df):
+    st.title("AI Job Market: Strategic Analysis 2024")
+    st.caption("Comprehensive evaluation of global AI employment telemetry and compensation paradigms")
+    
+    # Metrics
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Total Listings", f"{len(df):,}")
+    m2.metric("Unique Roles", f"{df['job_title'].nunique():,}")
+    m3.metric("Avg Salary", f"${df['salary'].mean():,.0f}")
+    m4.metric("Countries", f"{df['country'].nunique():,}")
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Market Composition", "Salary Dynamics", "Industry Intelligence", "Company Scaling"])
+
+    with tab1:
+        st.write("#### Top Dominant AI Roles")
+        top_roles = df['job_title'].value_counts().head(10)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x=top_roles.values, y=top_roles.index, palette="viridis", ax=ax)
+        plt.title("Role Distribution Frequency", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.write("#### Global Salary Distribution")
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.histplot(df['salary'], bins=30, kde=True, color=VIBRANT_CYAN, ax=ax)
+            plt.title("Compensation Density", fontweight='bold')
+            st.pyplot(fig)
+        
+        with col_b:
+            st.write("#### Salary by Experience Level")
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.boxplot(x='experience_level', y='salary', data=df, palette="magma", ax=ax)
+            plt.title("Experience-Yield Attribution", fontweight='bold')
+            st.pyplot(fig)
+
+    with tab3:
+        st.write("#### Industry Penetration vs. Compensation")
+        ind_stats = df.groupby('company_industry').agg({'salary': 'mean', 'job_title': 'count'}).rename(columns={'job_title': 'Count'}).sort_values('Count', ascending=False).head(10)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x=ind_stats['salary'], y=ind_stats.index, palette="flare", ax=ax)
+        plt.title("Top Industries by Strategic Value (Avg Salary)", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab4:
+        st.write("#### Company Size Scaling Analysis")
+        size_salary = df.groupby('company_size')['salary'].mean().sort_values(ascending=False)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(x=size_salary.index, y=size_salary.values, palette="crest", ax=ax)
+        plt.title("Average Salary by Organizational Scale", fontweight='bold')
+        st.pyplot(fig)
+
+    st.markdown("[Explore Full Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis)")
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -818,6 +881,7 @@ def main():
     st.sidebar.markdown("- [Oscar Cinematic Excellence](https://www.kaggle.com/code/sittminthar/oscar-cinematic-excellence-the-academy-awards)")
     st.sidebar.markdown("- [Autism Prediction AI](https://www.kaggle.com/code/sittminthar/predict-autism-spectrum-disorder)")
     st.sidebar.markdown("- [Breast Cancer Strategic EDA](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced)")
+    st.sidebar.markdown("- [AI Job Market Analysis](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis)")
     
     st.sidebar.markdown("---")
     st.sidebar.caption("Portfolio Developed by **Sitt Min Thar**")
@@ -864,6 +928,9 @@ def main():
     elif page == "Oncology Strategic Analysis":
         c_df, s_df, r_df = load_breast_cancer_data()
         show_breast_cancer(c_df, s_df, r_df)
+    elif page == "AI Job Market Analysis":
+        df = load_ai_job_data()
+        show_ai_job_market(df)
 
 if __name__ == "__main__":
     main()

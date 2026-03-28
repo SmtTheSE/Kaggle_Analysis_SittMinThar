@@ -25,6 +25,8 @@
 !Makeup_sale_2025/
 !oscar_sount_track1934_2026/
 !Predict Autism Spectrum Disorder/
+!Breast_Cancer_EDA/
+!AI_JOB_Market_Analysis/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -38,6 +40,8 @@
 !Makeup_sale_2025/*.csv
 !oscar_sount_track1934_2026/*.csv
 !Predict Autism Spectrum Disorder/*.csv
+!Breast_Cancer_EDA/*.csv
+!AI_JOB_Market_Analysis/*.csv
 
 # Allow essential configuration files
 !.gitignore
