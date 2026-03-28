@@ -27,6 +27,7 @@
 !Predict Autism Spectrum Disorder/
 !Breast_Cancer_EDA/
 !AI_JOB_Market_Analysis/
+!github_top_repos/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -42,6 +43,7 @@
 !Predict Autism Spectrum Disorder/*.csv
 !Breast_Cancer_EDA/*.csv
 !AI_JOB_Market_Analysis/*.csv
+!github_top_repos/*.csv
 
 # Allow essential configuration files
 !.gitignore
