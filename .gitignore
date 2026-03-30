@@ -28,6 +28,7 @@
 !Breast_Cancer_EDA/
 !AI_JOB_Market_Analysis/
 !github_top_repos/
+!Nike_Sale_EDA/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -44,6 +45,8 @@
 !Breast_Cancer_EDA/*.csv
 !AI_JOB_Market_Analysis/*.csv
 !github_top_repos/*.csv
+!Nike_Sale_EDA/*.csv
+!Nike_Sale_EDA/*.ipynb
 
 # Allow essential configuration files
 !.gitignore

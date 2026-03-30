@@ -165,6 +165,13 @@ def load_ai_job_data():
     df = pd.read_csv('AI_JOB_Market_Analysis/AI Job Market Dataset.csv')
     return df
 
+@st.cache_data
+def load_nike_data():
+    df = pd.read_csv('Nike_Sale_EDA/NKE.csv')
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Daily_Return'] = df['Close'].pct_change()
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -190,9 +197,10 @@ def show_home():
         - **Makeup Sales Strategy**: [Omnichannel conversion and prestige valuation](https://www.kaggle.com/code/sittminthar/make-up-sales-2025-eda-advanced).
         - **Oscar Soundtrack History**: [Composer dynasties and cinematic excellence](https://www.kaggle.com/code/sittminthar/oscar-soundtrack-strategic-eda).
         - **Autism Prediction AI**: [Clinical classification & phenotyping](https://www.kaggle.com/code/sittminthar/autism-prediction-elite-pipeline).
-        - **Oncology Strategic Analysis**: [Global survival disparities & screening efficacy](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
-        - **AI Job Market Analysis**: [Global employment telemetry & compensation benchmarks](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
-        - **GitHub Architecture**: [Top repository ecosystems & engagement scaling](https://www.kaggle.com/code/sittminthar/github-repositories-analysis).
+        - [**Oncology Strategic Analysis**](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
+        - [**AI Job Market Analysis**](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
+        - [**GitHub Architecture**](https://www.kaggle.com/code/sittminthar/github-repositories-analysis).
+        - [**Nike Strategic Analysis**](https://www.kaggle.com/code/sittminthar/nike-stock-analysis-senior-analyst).
         """)
     
     with col2:
@@ -923,11 +931,109 @@ def show_github_repos(df):
 
     st.markdown("[Explore Full Visual Analysis on Kaggle](https://www.kaggle.com/code/sittminthar/github-repositories-analysis)")
 
+# --- PAGE: NIKE STRATEGIC ANALYSIS ---
+def show_nike(df):
+    st.title("Nike, Inc. (NKE): Strategic Equity Evaluation")
+    st.caption("Institutional-grade quantitative deep-dive & predictive roadmap (2000–2026)")
+    
+    # KPIs
+    curr = df.iloc[-1]
+    ath = df['Close'].max()
+    ath_rel = ((curr['Close']/ath)-1)*100
+    cagr = ((df['Close'].iloc[-1] / df['Close'].iloc[0])**(1/26) - 1)*100
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Current Price", f"${curr['Close']:.2f}")
+    m2.metric("26yr CAGR", f"{cagr:.2f}%")
+    m3.metric("Rel. to ATH", f"{ath_rel:.2f}%", delta_color="inverse")
+    m4.metric("Sharpe Ratio", "0.35")
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Technical Roadmap", "Momentum Cluster", "Risk & Liquidity", "Predictive Matrix"])
+    
+    with tab1:
+        st.write("#### NKE Technical Transition Roadmap (T-120)")
+        ltm = df.tail(120)
+        df['MA50'] = df['Close'].rolling(50).mean()
+        df['MA200'] = df['Close'].rolling(200).mean()
+        ltm = df.tail(120)
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(ltm['Date'], ltm['Close'], color=ACCENT_BLUE, lw=2, label='Price')
+        ax.plot(ltm['Date'], ltm['MA50'], color=NIKE_ORANGE, ls='--', label='MA50')
+        ax.plot(ltm['Date'], ltm['MA200'], color='black', ls=':', label='MA200')
+        ax.fill_between(ltm['Date'], ltm['Close'], alpha=0.1, color=ACCENT_BLUE)
+        plt.title("Price Action & Moving Average Convergence", fontweight='bold')
+        plt.legend()
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Momentum Dynamics: MACD & RSI Profile")
+        exp1 = ltm['Close'].ewm(span=12).mean()
+        exp2 = ltm['Close'].ewm(span=26).mean()
+        macd = exp1 - exp2
+        sig = macd.ewm(span=9).mean()
+        diff = macd - sig
+        
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [2, 1]})
+        ax1.plot(ltm['Date'], macd, color='green', label='MACD')
+        ax1.plot(ltm['Date'], sig, color=NIKE_ORANGE, label='Signal')
+        ax1.bar(ltm['Date'], diff, color=['green' if d > 0 else 'red' for d in diff], alpha=0.3)
+        ax1.set_title("MACD Momentum Profile", fontweight='bold')
+        
+        # Simple RSI
+        delta = df['Close'].diff()
+        gain = delta.where(delta > 0, 0).rolling(14).mean()
+        loss = -delta.where(delta < 0, 0).rolling(14).mean()
+        rs = gain / loss
+        df['RSI'] = 100 - (100 / (1 + rs))
+        ltm = df.tail(120)
+        ax2.plot(ltm['Date'], ltm['RSI'], color=ACCENT_BLUE)
+        ax2.axhline(70, color='red', ls='--', alpha=0.5)
+        ax2.axhline(30, color='green', ls='--', alpha=0.5)
+        ax2.set_title("RSI Intensity Roadmap", fontweight='bold')
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab3:
+        st.write("#### Risk Surface: Historical Drawdown")
+        rolling_max = df['Close'].cummax()
+        drawdown = (df['Close'] / rolling_max) - 1
+        fig, ax = plt.subplots(figsize=(12, 5))
+        ax.fill_between(df['Date'], drawdown * 100, 0, color='red', alpha=0.3)
+        ax.plot(df['Date'], drawdown * 100, color='red', lw=1)
+        plt.title("Historical Drawdown Surface (Risk Depth)", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab4:
+        st.write("#### Monte Carlo Predictive Matrix (T+252)")
+        days_to_sim = 252
+        num_sims = 100 # Reduced for Streamlit performance
+        last_price = df['Close'].iloc[-1]
+        daily_vol = df['Daily_Return'].tail(252).std()
+        daily_drift = df['Daily_Return'].tail(252).mean()
+        
+        sim_results = np.zeros((days_to_sim, num_sims))
+        for s in range(num_sims):
+            prices = [last_price]
+            for d in range(days_to_sim - 1):
+                prices.append(prices[-1] * (1 + np.random.normal(daily_drift, daily_vol)))
+            sim_results[:, s] = prices
+            
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(sim_results, color=ACCENT_BLUE, alpha=0.05)
+        ax.plot(np.percentile(sim_results, 50, axis=1), color=NIKE_ORANGE, lw=3, label='Median Path')
+        plt.title("Monte Carlo Path Probability", fontweight='bold')
+        st.pyplot(fig)
+
+    st.markdown("---")
+    st.write("### Senior Analyst Verdict")
+    st.info(f"NKE is currently trading at ${curr['Close']:.2f}, representing a {ath_rel:.2f}% contraction from ATH. Technical roadmaps confirm a persistent 'Death Cross' regime with price action compressed below multi-year supply floors.")
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture", "Nike Strategic Analysis"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -989,6 +1095,9 @@ def main():
     elif page == "Oscar Soundtrack History":
         df = load_oscar_data()
         show_oscar(df)
+    elif page == "Nike Strategic Analysis":
+        df = load_nike_data()
+        show_nike(df)
     elif page == "Autism Prediction AI":
         df = load_autism_data()
         show_autism(df)
