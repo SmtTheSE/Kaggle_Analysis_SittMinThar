@@ -202,7 +202,7 @@ def show_home():
         - [**Oncology Strategic Analysis**](https://www.kaggle.com/code/sittminthar/breast-cancer-stat-aware-eda-advanced).
         - [**AI Job Market Analysis**](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
         - [**GitHub Architecture**](https://www.kaggle.com/code/sittminthar/github-repositories-analysis).
-        - [**Nike Strategic Analysis**](https://www.kaggle.com/code/sittminthar/nike-stock-analysis-senior-analyst).
+        - [**Nike Strategic Analysis**](https://www.kaggle.com/code/sittminthar/nike-stock-analysis-data-analyst).
         """)
     
     with col2:
@@ -936,7 +936,7 @@ def show_github_repos(df):
 # --- PAGE: NIKE STRATEGIC ANALYSIS ---
 def show_nike(df):
     st.title("Nike, Inc. (NKE): Strategic Equity Evaluation")
-    st.caption("Institutional-grade quantitative deep-dive & predictive roadmap (2000–2026)")
+    st.caption("Quantitative Deep-Dive & Predictive Roadmap | Data Analyst: Sitt Min Thar (2000–2026)")
     
     # KPIs
     curr = df.iloc[-1]
@@ -1028,7 +1028,7 @@ def show_nike(df):
         st.pyplot(fig)
 
     st.markdown("---")
-    st.write("### Senior Analyst Verdict")
+    st.write("### Data Analyst Verdict | Sitt Min Thar")
     st.info(f"NKE is currently trading at ${curr['Close']:.2f}, representing a {ath_rel:.2f}% contraction from ATH. Technical roadmaps confirm a persistent 'Death Cross' regime with price action compressed below multi-year supply floors.")
 
 # --- NAVIGATION ---
