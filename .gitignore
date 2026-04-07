@@ -29,6 +29,10 @@
 !AI_JOB_Market_Analysis/
 !github_top_repos/
 !Nike_Sale_EDA/
+!ASIA-Fuel/
+!Ecommerce/
+!Sleep_Health_and_lifeStyle/
+!gaming_laptops_2026/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -47,6 +51,10 @@
 !github_top_repos/*.csv
 !Nike_Sale_EDA/*.csv
 !Nike_Sale_EDA/*.ipynb
+!ASIA-Fuel/*.csv
+!Ecommerce/*.csv
+!Sleep_Health_and_lifeStyle/*.csv
+!gaming_laptops_2026/*.csv
 
 # Allow essential configuration files
 !.gitignore

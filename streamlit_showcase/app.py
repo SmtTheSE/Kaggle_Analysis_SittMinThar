@@ -174,6 +174,26 @@ def load_nike_data():
     df['Daily_Return'] = df['Close'].pct_change()
     return df
 
+@st.cache_data
+def load_asia_fuel_data():
+    df = pd.read_csv('ASIA-Fuel/asia_fuel_prices_detailed.csv')
+    return df
+
+@st.cache_data
+def load_ecommerce_data():
+    df = pd.read_csv('Ecommerce/ecommerce_dataset.csv')
+    return df
+
+@st.cache_data
+def load_sleep_data():
+    df = pd.read_csv('Sleep_Health_and_lifeStyle/Sleep_health_and_lifestyle_dataset.csv')
+    return df
+
+@st.cache_data
+def load_gaming_data():
+    df = pd.read_csv('gaming_laptops_2026/gaming_laptops_2026_q1.csv')
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -203,6 +223,10 @@ def show_home():
         - [**AI Job Market Analysis**](https://www.kaggle.com/code/sittminthar/ai-job-market-analysis).
         - [**GitHub Architecture**](https://www.kaggle.com/code/sittminthar/github-repositories-analysis).
         - [**Nike Strategic Analysis**](https://www.kaggle.com/code/sittminthar/nike-stock-analysis-data-analyst).
+        - [**Asia Fuel Dynamics**](https://www.kaggle.com/sittminthar).
+        - [**E-commerce Intelligence**](https://www.kaggle.com/sittminthar).
+        - [**Sleep Health & Lifestyle**](https://www.kaggle.com/sittminthar).
+        - [**Gaming Laptops 2026**](https://www.kaggle.com/sittminthar).
         """)
     
     with col2:
@@ -1031,11 +1055,126 @@ def show_nike(df):
     st.write("### Data Analyst Verdict | Sitt Min Thar")
     st.info(f"NKE is currently trading at ${curr['Close']:.2f}, representing a {ath_rel:.2f}% contraction from ATH. Technical roadmaps confirm a persistent 'Death Cross' regime with price action compressed below multi-year supply floors.")
 
+# --- PAGE: ASIA FUEL DYNAMICS ---
+def show_asia_fuel(df):
+    st.title("Asia Fuel Dynamics: Price & Affordability")
+    st.caption("Strategic Evaluation of Fuel Economics across the Asian Continent (2026)")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Avg Gasoline Price", f"${df['gasoline_usd_per_liter'].mean():.2f}/L")
+    m2.metric("Avg Diesel Price", f"${df['diesel_usd_per_liter'].mean():.2f}/L")
+    m3.metric("Highest Subsidy", df.loc[df['subsidy_cost_bn_usd'].idxmax(), 'country'])
+    m4.metric("Avg EV Adoption", f"{df['ev_adoption_pct'].mean():.1f}%")
+
+    tab1, tab2 = st.tabs(["Price Hierarchy", "Economic Correlation"])
+    
+    with tab1:
+        st.write("#### Gasoline Price by Country (USD/L)")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        df_sorted = df.sort_values('gasoline_usd_per_liter', ascending=False)
+        sns.barplot(x='gasoline_usd_per_liter', y='country', data=df_sorted, palette='viridis', ax=ax)
+        plt.title("Regional Fuel Price Stratification", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Affordability vs. Import Dependency")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.scatterplot(data=df, x='oil_import_dependency_pct', y='fuel_affordability_index', 
+                        size='avg_monthly_income_usd', hue='sub_region', alpha=0.7, sizes=(100, 1000), ax=ax)
+        plt.title("Economic Resilience Matrix", fontweight='bold')
+        st.pyplot(fig)
+
+# --- PAGE: E-COMMERCE INTELLIGENCE ---
+def show_ecommerce(df):
+    st.title("E-commerce Market Intelligence")
+    st.caption("High-Depth Evaluation of Global Retail Pricing & Category Dominance")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Total Products", f"{len(df):,}")
+    m2.metric("Avg Discount", f"{df['discount_pct'].mean():.1f}%")
+    m3.metric("Top Brand", df['brand'].mode()[0])
+    m4.metric("Avg Rating", f"{df['rating_score'].mean():.1f}⭐")
+
+    tab1, tab2 = st.tabs(["Category Analysis", "Pricing Dynamics"])
+    
+    with tab1:
+        st.write("#### Product Distribution by Category")
+        cat_counts = df['category'].value_counts()
+        fig, ax = plt.subplots(figsize=(8, 8))
+        plt.pie(cat_counts, labels=cat_counts.index, autopct='%1.1f%%', colors=sns.color_palette('pastel'), startangle=140)
+        plt.title("Inventory Segmentation", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Price Distribution by Category")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.boxplot(x='price_current', y='category', data=df, palette='magma', ax=ax)
+        plt.title("Strategic Pricing Tiers", fontweight='bold')
+        st.pyplot(fig)
+
+# --- PAGE: SLEEP HEALTH & LIFESTYLE ---
+def show_sleep(df):
+    st.title("Sleep Health & Lifestyle Analytics")
+    st.caption("Clinical Evaluation of Sleep Quality and Physiological Stressors")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Avg Sleep Duration", f"{df['Sleep Duration'].mean():.1f} hrs")
+    m2.metric("Avg Quality", f"{df['Quality of Sleep'].mean():.1f}/10")
+    m3.metric("Avg Stress Level", f"{df['Stress Level'].mean():.1f}/10")
+    m4.metric("Avg Daily Steps", f"{int(df['Daily_Steps'].mean()):,}")
+
+    tab1, tab2 = st.tabs(["Lifestyle Correlations", "Occupational Impact"])
+    
+    with tab1:
+        st.write("#### Sleep Duration vs. Quality")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.scatterplot(data=df, x='Sleep Duration', y='Quality of Sleep', hue='BMI Category', 
+                        style='Gender', s=100, alpha=0.8, ax=ax)
+        plt.title("Physiological Sleep Efficiency", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Stress Levels by Occupation")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        occ_stress = df.groupby('Occupation')['Stress Level'].mean().sort_values()
+        sns.barplot(x=occ_stress.values, y=occ_stress.index, palette='flare', ax=ax)
+        plt.title("Occupational Stress Attribution", fontweight='bold')
+        st.pyplot(fig)
+
+# --- PAGE: GAMING LAPTOPS 2026 ---
+def show_gaming_laptops(df):
+    st.title("Gaming Laptops 2026: Market Evaluation")
+    st.caption("Quantifying Next-Gen Mobile Computing Performance & Value")
+    
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Average Price", f"${df['price'].mean():,.2f}")
+    m2.metric("Top Brand", df['brand'].mode()[0])
+    m3.metric("Max Discount", f"{df['discount_pct'].max():.1f}%")
+    m4.metric("Avg Rating", f"{df['stars'].mean():.1f}⭐")
+
+    tab1, tab2 = st.tabs(["Pricing Landscape", "Brand Engagement"])
+    
+    with tab1:
+        st.write("#### Laptop Price Distribution")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.histplot(df['price'], bins=20, kde=True, color=ACCENT_BLUE, ax=ax)
+        plt.title("Strategic Valuation Depth", fontweight='bold')
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Stars vs. Price (by Reviews)")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.scatterplot(data=df, x='price', y='stars', size='reviews_count', 
+                        hue='brand', alpha=0.6, sizes=(50, 500), ax=ax)
+        plt.title("Market Sentiment vs. Capital Investment", fontweight='bold')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2)
+        st.pyplot(fig)
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
     page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture", "Nike Strategic Analysis"])
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture", "Nike Strategic Analysis", "Asia Fuel Dynamics", "E-commerce Intelligence", "Sleep Health & Lifestyle", "Gaming Laptops 2026"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -1112,6 +1251,18 @@ def main():
     elif page == "GitHub Repository Architecture":
         df = load_github_repos_data()
         show_github_repos(df)
+    elif page == "Asia Fuel Dynamics":
+        df = load_asia_fuel_data()
+        show_asia_fuel(df)
+    elif page == "E-commerce Intelligence":
+        df = load_ecommerce_data()
+        show_ecommerce(df)
+    elif page == "Sleep Health & Lifestyle":
+        df = load_sleep_data()
+        show_sleep(df)
+    elif page == "Gaming Laptops 2026":
+        df = load_gaming_data()
+        show_gaming_laptops(df)
 
 if __name__ == "__main__":
     main()
