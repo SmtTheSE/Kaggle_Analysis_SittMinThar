@@ -1121,7 +1121,7 @@ def show_sleep(df):
     m1.metric("Avg Sleep Duration", f"{df['Sleep Duration'].mean():.1f} hrs")
     m2.metric("Avg Quality", f"{df['Quality of Sleep'].mean():.1f}/10")
     m3.metric("Avg Stress Level", f"{df['Stress Level'].mean():.1f}/10")
-    m4.metric("Avg Daily Steps", f"{int(df['Daily_Steps'].mean()):,}")
+    m4.metric("Avg Daily Steps", f"{int(df['Daily Steps'].mean()):,}")
 
     tab1, tab2 = st.tabs(["Lifestyle Correlations", "Occupational Impact"])
     
