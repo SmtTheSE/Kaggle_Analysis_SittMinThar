@@ -33,6 +33,7 @@
 !Ecommerce/
 !Sleep_Health_and_lifeStyle/
 !gaming_laptops_2026/
+!YouTube_Top_1000_Channels_Analysis/
 
 # --- DATASET WHITELIST ---
 # Specifically allow these datasets (Must be after global csv ignore)
@@ -55,6 +56,7 @@
 !Ecommerce/*.csv
 !Sleep_Health_and_lifeStyle/*.csv
 !gaming_laptops_2026/*.csv
+!YouTube_Top_1000_Channels_Analysis/*.csv
 
 # Allow essential configuration files
 !.gitignore

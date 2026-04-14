@@ -194,6 +194,20 @@ def load_gaming_data():
     df = pd.read_csv('gaming_laptops_2026/gaming_laptops_2026_q1.csv')
     return df
 
+@st.cache_data
+def load_youtube_data():
+    df = pd.read_csv('YouTube_Top_1000_Channels_Analysis/youtube_top_1000_by_subscribers.csv')
+    df['published_at'] = pd.to_datetime(df['published_at'], errors='coerce')
+    df['channel_age_years'] = ((pd.Timestamp.now(tz='UTC') - df['published_at'].dt.tz_localize('UTC', ambiguous='NaT', nonexistent='NaT')) / pd.Timedelta(days=365.25)).round(1)
+    df['views'] = pd.to_numeric(df['views'], errors='coerce').fillna(0)
+    df['subs_per_video'] = (df['subscribers'] / df['videos'].replace(0, np.nan)).round(0)
+    df['views_B'] = (df['views'] / 1e9).round(2)
+    df['subs_M'] = (df['subscribers'] / 1e6).round(1)
+    df['topic_main'] = df['topic_categories'].fillna('').apply(
+        lambda x: x.split('/')[-1].replace('_', ' ').strip() if x else 'Unknown'
+    )
+    return df
+
 # --- PAGE: HOME ---
 def show_home():
     st.title("Analytical Showcase Portfolio")
@@ -227,6 +241,7 @@ def show_home():
         - [**E-commerce Intelligence**](https://www.kaggle.com/sittminthar).
         - [**Sleep Health & Lifestyle**](https://www.kaggle.com/sittminthar).
         - [**Gaming Laptops 2026**](https://www.kaggle.com/sittminthar).
+        - [**YouTube Top 1000 Channels**](https://www.kaggle.com/sittminthar).
         """)
     
     with col2:
@@ -1170,11 +1185,77 @@ def show_gaming_laptops(df):
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2)
         st.pyplot(fig)
 
+# --- PAGE: YOUTUBE TOP 1000 CHANNELS ---
+def show_youtube(df):
+    st.title("YouTube Top 1000 Channels")
+    st.markdown(f"**Domain:** <span style='color:{VIBRANT_PINK}'>Creator Economy Intelligence</span> | Subscriber Supremacy & Growth Architecture", unsafe_allow_html=True)
+    st.markdown("---")
+
+    # KPI Row
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Total Channels", f"{len(df):,}")
+    c2.metric("Highest Subscribers", f"{df['subscribers'].max()/1e6:.0f}M")
+    c3.metric("Total Views (T)", f"{df['views'].sum()/1e12:.2f}T")
+    c4.metric("Countries Represented", f"{df['country'].nunique()}")
+
+    st.markdown("---")
+    tab1, tab2, tab3, tab4 = st.tabs(["Country Breakdown", "Subscriber Tiers", "Content Volume", "Top Channels"])
+
+    with tab1:
+        st.write("#### Channels by Country (Top 15)")
+        country_counts = df['country'].value_counts().head(15).reset_index()
+        country_counts.columns = ['Country', 'Channels']
+        fig, ax = plt.subplots(figsize=(12, 5))
+        bars = ax.bar(country_counts['Country'], country_counts['Channels'], color=VIBRANT_CYAN, edgecolor=SAGA_BLACK, linewidth=0.6)
+        ax.bar_label(bars, padding=3, fontsize=9, fontweight='bold')
+        ax.set_xlabel("Country", fontweight='bold')
+        ax.set_ylabel("Number of Channels", fontweight='bold')
+        ax.set_title("Geographic Distribution of Top 1000 YouTube Channels", fontweight='bold')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab2:
+        st.write("#### Subscriber Distribution (Top 50 Channels)")
+        top50 = df.nlargest(50, 'subscribers')
+        fig, ax = plt.subplots(figsize=(12, 6))
+        colors = [VIBRANT_GREEN if i < 10 else VIBRANT_CYAN if i < 25 else SOFT_GREY for i in range(50)]
+        bars = ax.barh(top50['title'].iloc[::-1], top50['subs_M'].iloc[::-1], color=colors[::-1], edgecolor=SAGA_BLACK, linewidth=0.4)
+        ax.set_xlabel("Subscribers (Millions)", fontweight='bold')
+        ax.set_title("Top 50 Channels by Subscriber Count", fontweight='bold')
+        ax.tick_params(axis='y', labelsize=7)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab3:
+        st.write("#### Videos Uploaded vs Subscribers")
+        plot_df = df[(df['videos'] > 0) & (df['subs_M'] > 0)].copy()
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sc = ax.scatter(
+            plot_df['videos'], plot_df['subs_M'],
+            c=plot_df['views_B'], cmap='plasma',
+            alpha=0.6, s=40, edgecolors='none'
+        )
+        plt.colorbar(sc, ax=ax, label='Views (Billions)')
+        ax.set_xscale('log')
+        ax.set_xlabel("Videos Uploaded (log scale)", fontweight='bold')
+        ax.set_ylabel("Subscribers (Millions)", fontweight='bold')
+        ax.set_title("Content Volume vs Subscriber Base", fontweight='bold')
+        plt.tight_layout()
+        st.pyplot(fig)
+
+    with tab4:
+        st.write("#### Top 20 Channels — Full Profile")
+        top20 = df.nlargest(20, 'subscribers')[['rank', 'title', 'country', 'subs_M', 'views_B', 'videos', 'channel_age_years']].copy()
+        top20.columns = ['Rank', 'Channel', 'Country', 'Subscribers (M)', 'Views (B)', 'Videos', 'Age (yrs)']
+        st.dataframe(top20.reset_index(drop=True), use_container_width=True)
+
+
 # --- NAVIGATION ---
 def main():
     st.sidebar.markdown(f"<h1 style='color:{SAGA_BLACK}; font-size:24px;'>NAVIGATOR</h1>", unsafe_allow_html=True)
-    page = st.sidebar.radio("Select Analytics Product", 
-                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture", "Nike Strategic Analysis", "Asia Fuel Dynamics", "E-commerce Intelligence", "Sleep Health & Lifestyle", "Gaming Laptops 2026"])
+    page = st.sidebar.radio("Select Analytics Product",
+                            ["Home", "NVIDIA Multi-Era", "Global Urban Density", "BMW Sales Suite", "Cyberattack Forensic", "Netflix Content Strategy", "Spotify Wrap 2025", "UFC Advanced EDA", "Global Cosmetic Commerce", "Oscar Soundtrack History", "Autism Prediction AI", "Oncology Strategic Analysis", "AI Job Market Analysis", "GitHub Repository Architecture", "Nike Strategic Analysis", "Asia Fuel Dynamics", "E-commerce Intelligence", "Sleep Health & Lifestyle", "Gaming Laptops 2026", "YouTube Top 1000 Channels"])
     
     st.sidebar.markdown("---")
     st.sidebar.write("### Resource Hub")
@@ -1263,6 +1344,9 @@ def main():
     elif page == "Gaming Laptops 2026":
         df = load_gaming_data()
         show_gaming_laptops(df)
+    elif page == "YouTube Top 1000 Channels":
+        df = load_youtube_data()
+        show_youtube(df)
 
 if __name__ == "__main__":
     main()
