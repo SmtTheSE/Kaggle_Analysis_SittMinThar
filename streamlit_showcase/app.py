@@ -197,8 +197,8 @@ def load_gaming_data():
 @st.cache_data
 def load_youtube_data():
     df = pd.read_csv('YouTube_Top_1000_Channels_Analysis/youtube_top_1000_by_subscribers.csv')
-    df['published_at'] = pd.to_datetime(df['published_at'], errors='coerce')
-    df['channel_age_years'] = ((pd.Timestamp.now(tz='UTC') - df['published_at'].dt.tz_localize('UTC', ambiguous='NaT', nonexistent='NaT')) / pd.Timedelta(days=365.25)).round(1)
+    df['published_at'] = pd.to_datetime(df['published_at'], errors='coerce', utc=True)
+    df['channel_age_years'] = ((pd.Timestamp.now(tz='UTC') - df['published_at']) / pd.Timedelta(days=365.25)).round(1)
     df['views'] = pd.to_numeric(df['views'], errors='coerce').fillna(0)
     df['subs_per_video'] = (df['subscribers'] / df['videos'].replace(0, np.nan)).round(0)
     df['views_B'] = (df['views'] / 1e9).round(2)
